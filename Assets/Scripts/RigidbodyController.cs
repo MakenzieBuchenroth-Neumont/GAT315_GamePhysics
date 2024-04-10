@@ -1,15 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.ExceptionServices;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
 public class RigidbodyController : MonoBehaviour {
+
 	[SerializeField] float speed = 1;
-	[SerializeField] ForceMode forceMode = ForceMode.Force;
+	[SerializeField] float angulerSpeed = 1;
 	[SerializeField] Space space = Space.World;
+	[SerializeField] ForceMode mode;
+	[SerializeField] ForceMode torqueMode;
 
 	Rigidbody rb;
+
 	Vector3 force = Vector3.zero;
 	Vector3 torque = Vector3.zero;
 
@@ -22,24 +25,21 @@ public class RigidbodyController : MonoBehaviour {
 		float rotation = 0;
 
 		if (space == Space.World) direction.x = Input.GetAxis("Horizontal");
-		else if (space == Space.Self) {
-			rotation = Input.GetAxis("Horizontal");
-		}
+		else { rotation = Input.GetAxis("Horizontal"); }
 
 		direction.z = Input.GetAxis("Vertical");
 		direction = Vector3.ClampMagnitude(direction, 1);
 
 		force = direction * speed;
-		torque = Vector3.up * rotation * speed;
+		torque = Vector3.up * rotation * angulerSpeed;
+		//transform.rotation = Quaternion.Euler(0, rotation speed, 0);
+		//transform.Translate(direction * speed * Time.deltaTime, space);
 	}
 
-	private void FixedUpdate() {
-		rb.AddRelativeForce(force, forceMode);
-		rb.AddTorque(torque, forceMode);
+	void FixedUpdate() {
+		rb.AddRelativeForce(force, mode);
+		rb.AddTorque(torque, torqueMode);
 	}
-
-	// RGB
-	// XYZ
 
 	private void OnDrawGizmos() {
 		Gizmos.color = Color.blue;
